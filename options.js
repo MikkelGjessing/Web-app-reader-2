@@ -8,6 +8,8 @@
   const form = document.getElementById('options-form');
   const webAppUrlInput = document.getElementById('webAppUrl');
   const overlayEnabledCheckbox = document.getElementById('overlayEnabledByDefault');
+  const useBackdropCheckbox = document.getElementById('useBackdrop');
+  const pinnedModeCheckbox = document.getElementById('pinnedModeDefault');
   const saveButton = document.getElementById('save-btn');
   const resetButton = document.getElementById('reset-btn');
   const statusMessage = document.getElementById('status-message');
@@ -60,10 +62,10 @@
    */
   function loadSettings() {
     // Try sync storage first, fallback to local
-    chrome.storage.sync.get(['webAppUrl', 'overlayEnabledByDefault'], (result) => {
+    chrome.storage.sync.get(['webAppUrl', 'overlayEnabledByDefault', 'useBackdrop', 'pinnedModeDefault'], (result) => {
       if (chrome.runtime.lastError) {
         // Fallback to local storage
-        chrome.storage.local.get(['webAppUrl', 'overlayEnabledByDefault'], (localResult) => {
+        chrome.storage.local.get(['webAppUrl', 'overlayEnabledByDefault', 'useBackdrop', 'pinnedModeDefault'], (localResult) => {
           if (!chrome.runtime.lastError) {
             applySettings(localResult);
           } else {
@@ -82,6 +84,8 @@
   function applySettings(settings) {
     webAppUrlInput.value = settings.webAppUrl || '';
     overlayEnabledCheckbox.checked = settings.overlayEnabledByDefault || false;
+    useBackdropCheckbox.checked = settings.useBackdrop || false;
+    pinnedModeCheckbox.checked = settings.pinnedModeDefault || false;
   }
 
   /**
@@ -92,6 +96,8 @@
     
     const url = webAppUrlInput.value.trim();
     const enabledByDefault = overlayEnabledCheckbox.checked;
+    const useBackdrop = useBackdropCheckbox.checked;
+    const pinnedModeDefault = pinnedModeCheckbox.checked;
 
     // Validate URL if provided
     if (url && !isValidHttpUrl(url)) {
@@ -104,7 +110,9 @@
 
     const settings = {
       webAppUrl: url,
-      overlayEnabledByDefault: enabledByDefault
+      overlayEnabledByDefault: enabledByDefault,
+      useBackdrop: useBackdrop,
+      pinnedModeDefault: pinnedModeDefault
     };
 
     // Disable save button during save
@@ -138,11 +146,15 @@
     if (confirm('Are you sure you want to reset all settings to defaults?')) {
       webAppUrlInput.value = '';
       overlayEnabledCheckbox.checked = false;
+      useBackdropCheckbox.checked = false;
+      pinnedModeCheckbox.checked = false;
       showUrlError(false);
       
       const defaultSettings = {
         webAppUrl: '',
-        overlayEnabledByDefault: false
+        overlayEnabledByDefault: false,
+        useBackdrop: false,
+        pinnedModeDefault: false
       };
 
       // Save default settings
