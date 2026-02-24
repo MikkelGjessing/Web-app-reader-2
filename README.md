@@ -4,11 +4,18 @@ A Chrome Extension (Manifest V3) that displays a configurable web app in an over
 
 ## Features
 
-- **Overlay Panel**: Fixed-position panel on the right side (16.666% width, 100% height)
+- **Overlay Panel**: Fixed-position panel on the right side (default 16.666% width, 100% height)
+- **Drag-to-Resize**: Grab the left edge of the overlay to adjust width between 10% and 50% of viewport
+- **Persistent Width**: Your chosen width is saved and synced across devices
+- **Keyboard Shortcut**: Press Ctrl+Shift+Y (Cmd+Shift+Y on Mac) to toggle the overlay
+- **Pin Mode**: Click the 📌 button to keep overlay open across all sites
 - **Toggle Control**: Click the extension icon to show/hide the overlay
 - **Configurable URL**: Set any web app URL in the options page
 - **Auto-show Option**: Choose whether to show the overlay by default on new pages
-- **Clean UI**: Minimal header bar with close button
+- **Backdrop Mode**: Optional translucent backdrop behind overlay to reduce distraction
+- **Clean UI**: Minimal header bar with pin and close buttons
+- **Shadow DOM Isolation**: Complete CSS isolation prevents conflicts with host pages
+- **Performance Optimized**: Throttled resize events with requestAnimationFrame for smooth 60fps
 - **Security**: Iframe sandboxing with configurable attributes
 
 ## Installation
@@ -35,9 +42,11 @@ A Chrome Extension (Manifest V3) that displays a configurable web app in an over
 
 ### Using the Overlay
 
-- **Show/Hide**: Click the extension icon in the toolbar
-- **Close**: Click the × button in the overlay header
-- **Resize**: The overlay automatically adjusts to 16.666% of viewport width (1/6)
+- **Show/Hide**: Click the extension icon in the toolbar or press Ctrl+Shift+Y (Cmd+Shift+Y on Mac)
+- **Close**: Click the × button in the overlay header or click the backdrop (if enabled)
+- **Resize**: Drag the left edge of the overlay to adjust width between 10% and 50% of viewport
+- **Pin Mode**: Click the 📌 button to keep the overlay open across all sites
+- **Backdrop**: Enable in options for a translucent backdrop that reduces distraction
 
 ### Example Web Apps to Try
 
@@ -73,12 +82,28 @@ This extension uses Manifest V3, the latest Chrome extension platform with:
 - Service worker instead of background pages
 - Improved security and performance
 - Modern Chrome APIs
+- Keyboard commands for accessibility
+
+### Shadow DOM
+
+The overlay uses Shadow DOM for complete CSS isolation:
+- **Benefits**: Prevents host page styles from breaking overlay UI and vice versa
+- **Implementation**: Styles defined in shadow root are completely scoped
+- **Tradeoffs**: Slight complexity in setup, but better encapsulation and no conflicts
+
+### Performance
+
+- **Single Root Container**: Minimizes DOM operations
+- **Throttled Resize**: requestAnimationFrame ensures smooth 60fps during resize
+- **Transform-based Animations**: Hardware-accelerated transitions
+- **No Layout Thrashing**: Avoids forced synchronous layouts during interactions
 
 ### Message Passing
 
 - Background service worker listens for extension icon clicks
 - Sends `{type: "TOGGLE_OVERLAY"}` message to active tab
 - Content script receives message and toggles overlay visibility
+- Pin mode state synchronized with background script
 
 ### Storage
 
@@ -87,6 +112,10 @@ This extension uses Manifest V3, the latest Chrome extension platform with:
 - Stored values:
   - `webAppUrl`: The web app URL to display
   - `overlayEnabledByDefault`: Whether to auto-show overlay
+  - `overlayWidth`: User's preferred overlay width (percentage)
+  - `pinnedMode`: Whether overlay stays open across all sites
+  - `useBackdrop`: Whether to show translucent backdrop
+  - `pinnedModeDefault`: Default pin mode for new installations
 
 ### Security Considerations
 
