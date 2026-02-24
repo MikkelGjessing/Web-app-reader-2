@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web App Reader Extension - Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      padding: 40px;
+      background: #f5f5f5;
+    }
+
+    .page-content {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #0066cc;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #333;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+
+    p {
+      margin-bottom: 15px;
+      color: #666;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .feature-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .feature-list li:before {
+      content: "✓ ";
+      color: #0066cc;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    .controls {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 10000;
+    }
+
+    .controls h3 {
+      margin-bottom: 15px;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .controls button {
+      background: #0066cc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      width: 100%;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .controls button:hover {
+      background: #0052a3;
+    }
+
+    .controls .info {
+      font-size: 12px;
+      color: #666;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    /* Demo overlay styles - simulating the actual extension */
+    .demo-overlay-host {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      z-index: 2147483647;
+      background: #ffffff;
+      border-left: 2px solid #e0e0e0;
+      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .demo-overlay-host.visible {
+      transform: translateX(0);
+    }
+
+    .resize-handle {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 8px;
+      cursor: ew-resize;
+      background: transparent;
+      z-index: 10;
+      transition: background-color 0.2s;
+    }
+
+    .resize-handle:hover,
+    .resize-handle.active {
+      background: rgba(0, 102, 204, 0.3);
+    }
+
+    .resize-handle::before {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 40px;
+      background: #d0d0d0;
+      border-radius: 2px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .resize-handle:hover::before,
+    .resize-handle.active::before {
+      opacity: 1;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #f5f5f5;
+      border-bottom: 1px solid #e0e0e0;
+      flex-shrink: 0;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333333;
+    }
+
+    .pin-button {
+      background: transparent;
+      border: none;
+      font-size: 16px;
+      color: #666666;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .pin-button:hover {
+      background: #e0e0e0;
+      color: #333333;
+    }
+
+    .pin-button.pinned {
+      color: #0066cc;
+    }
+
+    .close-button {
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      color: #666666;
+      cursor: pointer;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .close-button:hover {
+      background: #e0e0e0;
+      color: #333333;
+    }
+
+    .content {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+      color: #666;
+    }
+
+    .backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 2147483646;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      backdrop-filter: blur(2px);
+    }
+
+    .backdrop.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <h3>🎨 Extension Demo Controls</h3>
+    <button onclick="toggleOverlay()">Toggle Overlay</button>
+    <button onclick="togglePinMode()">Toggle Pin Mode</button>
+    <button onclick="toggleBackdrop()">Toggle Backdrop</button>
+    <div class="info">
+      <strong>Demo Features:</strong><br>
+      • Drag left edge to resize<br>
+      • Pin button in header<br>
+      • Backdrop click to close<br>
+      • Keyboard: Ctrl+Shift+Y
+    </div>
+  </div>
+
+  <div class="page-content">
+    <h1>Web App Reader Extension - Interactive Demo</h1>
+    
+    <p>This demo page showcases the new features implemented in the Web App Reader Chrome Extension.</p>
+
+    <h2>✨ New Features</h2>
+    <ul class="feature-list">
+      <li><strong>Drag-to-Resize:</strong> Grab the left edge of the overlay to adjust width between 10% and 50% of viewport (default 16.666%)</li>
+      <li><strong>Persistent Width:</strong> Your chosen width is saved per user using chrome.storage.sync</li>
+      <li><strong>Keyboard Shortcut:</strong> Press Ctrl+Shift+Y (Cmd+Shift+Y on Mac) to toggle the overlay</li>
+      <li><strong>Pin Mode:</strong> Click the 📌 button to keep overlay open across all sites</li>
+      <li><strong>Translucent Backdrop:</strong> Optional backdrop behind overlay to reduce distraction (click to close)</li>
+      <li><strong>Shadow DOM Isolation:</strong> Complete CSS isolation prevents conflicts with host pages</li>
+      <li><strong>Performance Optimized:</strong> Single root container, throttled resize with requestAnimationFrame</li>
+      <li><strong>Enhanced Options:</strong> New toggles for backdrop, pin mode default, and overlay default</li>
+    </ul>
+
+    <h2>🎯 Implementation Highlights</h2>
+    <p><strong>Shadow DOM:</strong> We use Shadow DOM to completely isolate our styles from the host page. This prevents both host page styles from breaking our overlay and our styles from affecting the host page.</p>
+
+    <p><strong>Performance:</strong> Resize events are throttled using requestAnimationFrame to maintain 60fps. We use a single root container (shadow host) to minimize DOM operations and transform-based animations for smooth transitions.</p>
+
+    <p><strong>CSS Isolation Tradeoffs:</strong></p>
+    <ul style="margin-left: 20px; color: #666;">
+      <li><strong>Pros:</strong> Complete CSS isolation, cleaner DOM separation, better encapsulation</li>
+      <li><strong>Cons:</strong> Slight complexity in event handling, requires careful setup for accessibility</li>
+      <li><strong>Solution:</strong> Event listeners attached to elements inside shadow DOM work perfectly</li>
+    </ul>
+
+    <h2>📝 Usage Instructions</h2>
+    <p>Use the controls in the top-left corner to test the features. Try dragging the left edge of the overlay to resize it!</p>
+  </div>
+
+  <!-- Backdrop -->
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- Demo Overlay -->
+  <div class="demo-overlay-host" id="overlay">
+    <div class="resize-handle" id="resizeHandle"></div>
+    <div class="header">
+      <div class="header-left">
+        <span class="title">Web App Reader</span>
+      </div>
+      <div class="header-right">
+        <button class="pin-button" id="pinButton" title="Toggle pin mode">📌</button>
+        <button class="close-button" onclick="toggleOverlay()">×</button>
+      </div>
+    </div>
+    <div class="content">
+      <div>
+        <h3>Demo Overlay Content</h3>
+        <p>This is where your web app would load</p>
+        <p style="font-size: 12px; margin-top: 20px;">Try dragging the left edge to resize!</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let overlayVisible = false;
+    let pinnedMode = false;
+    let backdropEnabled = false;
+    let overlayWidth = 16.666;
+    let isResizing = false;
+    let resizeRAF = null;
+
+    const overlay = document.getElementById('overlay');
+    const backdrop = document.getElementById('backdrop');
+    const pinButton = document.getElementById('pinButton');
+    const resizeHandle = document.getElementById('resizeHandle');
+
+    function toggleOverlay() {
+      overlayVisible = !overlayVisible;
+      overlay.classList.toggle('visible', overlayVisible);
+      if (backdropEnabled) {
+        backdrop.classList.toggle('visible', overlayVisible);
+      }
+    }
+
+    function togglePinMode() {
+      pinnedMode = !pinnedMode;
+      pinButton.classList.toggle('pinned', pinnedMode);
+      pinButton.title = pinnedMode ? 'Unpin from all sites' : 'Pin overlay to all sites';
+    }
+
+    function toggleBackdrop() {
+      backdropEnabled = !backdropEnabled;
+      if (!backdropEnabled) {
+        backdrop.classList.remove('visible');
+      } else if (overlayVisible) {
+        backdrop.classList.add('visible');
+      }
+    }
+
+    // Resize functionality
+    resizeHandle.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      isResizing = true;
+      resizeHandle.classList.add('active');
+      document.body.style.userSelect = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isResizing) return;
+      
+      if (resizeRAF) cancelAnimationFrame(resizeRAF);
+      
+      resizeRAF = requestAnimationFrame(() => {
+        const viewportWidth = window.innerWidth;
+        const rightEdge = viewportWidth - e.clientX;
+        const newWidthPercent = (rightEdge / viewportWidth) * 100;
+        const constrainedWidth = Math.max(10, Math.min(50, newWidthPercent));
+        
+        overlayWidth = constrainedWidth;
+        overlay.style.width = `${overlayWidth}%`;
+      });
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (!isResizing) return;
+      isResizing = false;
+      resizeHandle.classList.remove('active');
+      document.body.style.userSelect = '';
+    });
+
+    // Backdrop click to close
+    backdrop.addEventListener('click', () => {
+      toggleOverlay();
+    });
+
+    // Keyboard shortcut simulation
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'Y') {
+        toggleOverlay();
+      }
+    });
+
+    // Set initial width
+    overlay.style.width = `${overlayWidth}%`;
+  </script>
+</body>
+</html>

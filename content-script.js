@@ -41,6 +41,7 @@
   const MIN_WIDTH_PERCENT = 10;
   const MAX_WIDTH_PERCENT = 50;
   const Z_INDEX = 2147483647; // Maximum safe z-index
+  const BACKDROP_Z_INDEX = Z_INDEX - 1; // One level below overlay
 
   /**
    * Creates styles for the shadow DOM
@@ -271,7 +272,7 @@
         right: 0;
         bottom: 0;
         background: rgba(0, 0, 0, 0.3);
-        z-index: ${Z_INDEX - 1};
+        z-index: ${BACKDROP_Z_INDEX};
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
@@ -527,15 +528,15 @@
       if (!document.body.contains(backdrop)) {
         document.body.appendChild(backdrop);
       }
-      // Force reflow
-      backdrop.offsetHeight;
+      // Force reflow to enable CSS transition - intentional synchronous layout
+      void backdrop.offsetHeight;
       backdrop.style.opacity = '1';
       backdrop.style.visibility = 'visible';
     }
     
     const overlay = shadow.querySelector('.overlay');
-    // Force a reflow to enable CSS transition
-    overlay.offsetHeight;
+    // Force reflow to enable CSS transition - intentional synchronous layout
+    void overlay.offsetHeight;
     overlay.classList.add('visible');
     
     overlayVisible = true;
