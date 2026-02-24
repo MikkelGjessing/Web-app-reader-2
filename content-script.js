@@ -196,20 +196,8 @@
     if (message.type === 'TOGGLE_OVERLAY') {
       toggleOverlay();
       sendResponse({ success: true });
-    } else if (message.type === 'OPEN_OPTIONS') {
-      chrome.runtime.openOptionsPage();
-      sendResponse({ success: true });
     }
     return true; // Keep message channel open for async response
-  });
-
-  // Handle message sending for options button
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === 'OPEN_OPTIONS') {
-      chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS' });
-      sendResponse({ success: true });
-    }
-    return true;
   });
 
   // Initialize when DOM is ready

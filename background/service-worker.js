@@ -13,6 +13,15 @@ chrome.action.onClicked.addListener(async (tab) => {
   }
 });
 
+// Listen for messages from content scripts
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'OPEN_OPTIONS') {
+    chrome.runtime.openOptionsPage();
+    sendResponse({ success: true });
+  }
+  return true;
+});
+
 // Optional: Listen for installation/update events
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
