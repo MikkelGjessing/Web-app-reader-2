@@ -58,10 +58,17 @@
       iframe.setAttribute('title', 'Web App Reader Content');
       
       // Sandbox attributes - allow typical web app functionality
-      // Security tradeoff: allow-same-origin is required for most web apps to work
-      // but it does allow the iframe content to access storage and potentially
-      // make requests on behalf of the parent domain if they share origin.
-      // Consider removing allow-same-origin if loading untrusted content.
+      // SECURITY WARNING: The combination of 'allow-scripts' and 'allow-same-origin'
+      // effectively removes most sandbox protections. This means:
+      // 1. The iframe can execute JavaScript
+      // 2. The iframe is treated as same-origin if the URL matches the parent
+      // 3. The iframe can access cookies, localStorage, and make requests
+      // 
+      // ONLY use this extension with trusted web apps from sources you control.
+      // For untrusted content, consider:
+      // - Removing 'allow-same-origin' (breaks many web apps but increases security)
+      // - Implementing Content Security Policy headers
+      // - Using a different approach like opening in a new window instead
       iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-same-origin allow-popups allow-downloads');
       
       content.appendChild(iframe);

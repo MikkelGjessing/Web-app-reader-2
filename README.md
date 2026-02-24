@@ -90,19 +90,30 @@ This extension uses Manifest V3, the latest Chrome extension platform with:
 
 ### Security Considerations
 
+⚠️ **IMPORTANT SECURITY WARNING** ⚠️
+
 The iframe uses sandbox attributes to restrict capabilities:
 ```html
 sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-downloads"
 ```
 
-**Security Tradeoffs**:
-- `allow-same-origin`: Required for most web apps but allows iframe to access storage
-- `allow-scripts`: Required for interactive web apps
-- `allow-forms`: Allows form submission
-- `allow-popups`: Allows opening new windows
-- `allow-downloads`: Allows file downloads
+**Critical Security Notice**:
+The combination of `allow-scripts` and `allow-same-origin` effectively **removes most sandbox protections**. This means the iframe content can:
+- Execute JavaScript freely
+- Access cookies, localStorage, and sessionStorage
+- Make network requests
+- Potentially access the parent page's DOM if origins match
 
-⚠️ Only configure URLs from trusted sources as the iframe can execute scripts.
+**Best Practices**:
+- ✅ **ONLY** configure URLs from trusted sources you control
+- ✅ Use HTTPS URLs only
+- ❌ **DO NOT** use this extension to load untrusted or unknown web applications
+- ❌ **DO NOT** load content from sites you don't trust completely
+
+**For Enhanced Security** (at the cost of functionality):
+- Remove `allow-same-origin` from the sandbox attribute (this will break many web apps)
+- Implement Content Security Policy headers on your web app
+- Consider opening web apps in separate windows instead of iframes
 
 ## Development
 

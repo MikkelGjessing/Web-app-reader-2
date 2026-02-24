@@ -78,9 +78,13 @@ for js_file in "${js_files[@]}"; do
   if node -c "$js_file" 2>/dev/null; then
     echo -e "  ${GREEN}✓${NC} $js_file"
   else
-    # Node might not be available, try with a simple check
     if [ -f "$js_file" ]; then
-      echo -e "  ${YELLOW}⚠${NC} $js_file (syntax check skipped, Node.js not available)"
+      # Node.js not available - check if file at least exists and has content
+      if [ -s "$js_file" ]; then
+        echo -e "  ${YELLOW}⚠${NC} $js_file (syntax not validated - Node.js required for full check)"
+      else
+        echo -e "  ${RED}✗${NC} $js_file (file is empty)"
+      fi
     else
       echo -e "  ${RED}✗${NC} $js_file (file missing)"
     fi
