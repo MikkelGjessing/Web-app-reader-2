@@ -26,7 +26,3 @@ node_modules/
 
 # Log files
 *.log
-
-# Temporary scripts
-icons/create_icons.sh
-icons/create_minimal_icons.py

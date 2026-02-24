@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web App Reader - Testing Page</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      color: #333;
+    }
+    
+    h1 {
+      color: #0066cc;
+      border-bottom: 3px solid #0066cc;
+      padding-bottom: 10px;
+    }
+    
+    .info-box {
+      background: #f0f7ff;
+      border-left: 4px solid #0066cc;
+      padding: 15px 20px;
+      margin: 20px 0;
+    }
+    
+    .step {
+      background: #f5f5f5;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 5px;
+    }
+    
+    .step h3 {
+      margin-top: 0;
+      color: #0066cc;
+    }
+    
+    code {
+      background: #e8e8e8;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .success {
+      color: #1e8e3e;
+      font-weight: bold;
+    }
+    
+    .warning {
+      color: #f9ab00;
+      font-weight: bold;
+    }
+    
+    ul {
+      margin: 10px 0;
+    }
+    
+    li {
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Web App Reader Extension - Test Page</h1>
+  
+  <div class="info-box">
+    <strong>Purpose:</strong> This page is for testing the Web App Reader Chrome Extension after loading it into Chrome.
+  </div>
+
+  <div class="step">
+    <h3>Step 1: Load the Extension</h3>
+    <ol>
+      <li>Open Chrome and navigate to <code>chrome://extensions/</code></li>
+      <li>Enable <strong>"Developer mode"</strong> (toggle in top-right corner)</li>
+      <li>Click <strong>"Load unpacked"</strong></li>
+      <li>Select the <code>Web-app-reader-2</code> directory</li>
+      <li>The extension icon should appear in your toolbar</li>
+    </ol>
+  </div>
+
+  <div class="step">
+    <h3>Step 2: Configure the Extension</h3>
+    <ol>
+      <li>Click the extension icon - you should see a placeholder message</li>
+      <li>Click <strong>"Open Options"</strong> in the overlay OR right-click the extension icon and select "Options"</li>
+      <li>Enter a web app URL (try one of these):
+        <ul>
+          <li><code>https://keep.google.com</code></li>
+          <li><code>https://www.notion.so</code></li>
+          <li><code>https://trello.com</code></li>
+          <li><code>https://chat.openai.com</code></li>
+        </ul>
+      </li>
+      <li>Optionally check <strong>"Show overlay by default"</strong></li>
+      <li>Click <strong>"Save Settings"</strong></li>
+    </ol>
+  </div>
+
+  <div class="step">
+    <h3>Step 3: Test the Overlay</h3>
+    <ol>
+      <li>Reload this page (or visit any other website)</li>
+      <li>Click the extension icon in the toolbar</li>
+      <li>The overlay should slide in from the right side</li>
+      <li>The configured web app should load in the iframe</li>
+      <li>Click the <strong>×</strong> button to close the overlay</li>
+      <li>Click the extension icon again to reopen it</li>
+    </ol>
+  </div>
+
+  <div class="step">
+    <h3>What to Verify:</h3>
+    <ul>
+      <li class="success">✓ Overlay appears on the right side of the page</li>
+      <li class="success">✓ Overlay is exactly 16.666% (1/6) of the viewport width</li>
+      <li class="success">✓ Overlay slides in/out smoothly</li>
+      <li class="success">✓ Iframe loads the configured web app</li>
+      <li class="success">✓ Header shows "Web App Reader" title</li>
+      <li class="success">✓ Close button (×) works correctly</li>
+      <li class="success">✓ Extension icon toggles the overlay</li>
+      <li class="success">✓ Options page saves and loads settings</li>
+      <li class="success">✓ Overlay doesn't interfere with page content</li>
+    </ul>
+  </div>
+
+  <div class="info-box">
+    <strong>Note:</strong> If you encounter any issues, check the browser console for errors:
+    <ul>
+      <li>Page Console: Press <code>F12</code> or <code>Ctrl+Shift+I</code></li>
+      <li>Extension Service Worker: Go to <code>chrome://extensions/</code> → Find "Web App Reader" → Click "service worker"</li>
+    </ul>
+  </div>
+
+  <h2>Sample Content Below</h2>
+  <p>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+  </p>
+  <p>
+    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  </p>
+  <p>
+    This content should remain fully accessible even when the overlay is shown on the right side. 
+    The overlay should not push or alter the layout of this page - it simply overlays the content.
+  </p>
+  
+  <h3>More Sample Content</h3>
+  <p>
+    Scroll down to see if the overlay remains fixed in position...
+  </p>
+  
+  <div style="height: 800px; background: linear-gradient(to bottom, #f5f5f5, #e0e0e0); padding: 20px; margin: 20px 0;">
+    <p><strong>Spacer content area</strong></p>
+    <p>The overlay should remain fixed at the top-right corner even when you scroll this page.</p>
+  </div>
+  
+  <h3>Bottom of Page</h3>
+  <p>If you've scrolled here, verify that the overlay is still visible and fixed to the viewport.</p>
+</body>
+</html>
